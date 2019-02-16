@@ -1,107 +1,148 @@
 
-body{
+body {
     background-color: #FFFFFF;
     font-family: PMingLiU;
+    font-size: 1rem;
 }
 
-header{
+header {
     background-color: #FFFFFF;
-    width: 50%;
-    margin: 0 auto;
+    margin: 0 10% 0 10%;
+    border-bottom: 1px solid #000000;
 }
 
-header > nav{
-    min-width: 100%;
-    width: 70%;
+header > nav {
+    display: flex;
+    justify-content: center;
     margin: 0 auto;
-    padding-top: 4%;
-    padding-bottom: 4%;
+    padding: 4% 0 4% 0;
     text-align: center;
 }
 
-header > nav > a{
+header > nav > div {
     text-decoration: none;
-    margin-left: 20px;
-    margin-right: 20px;
-    font-size: 26px;
+    margin: 0 20px 0 20px;
+    font-size: 2rem;
     font-weight: bold;
     cursor: pointer;
 }
 
-header > nav > a:link{
-    color: #000000;
-    text-decoration:none;
-}
-
-header > nav > a:visited {
-    color: #000000;
-    text-decoration:none;
-}
-
-header > nav > a:hover{
-    color: #2C3E50;
-    text-decoration: underline;
-}
-
-aside > hr{
-    width: 70%;
-    margin: 0 auto;
-    margin-top: 0.7%;
-    margin-bottom: 0.7%;
-}
-
-article{
+article {
     background-color: #FFFFFF;
-    width: 60%;
+    width: 90%;
     margin: 0 auto;
-    padding-top: 2%;
-    padding-bottom: 2%;
+    padding: 2% 0 2% 0;
     overflow: hidden;
 }
 
-article > .tag{
-    text-align: right;
+article > .homepage {
+    display: flex;
+    justify-content: center;
 }
 
-article > .tag span{
-    font-size: 14px;
+article > .homepage > img {
+    display: inline-block;
+    height: auto;
+    max-width: 100%;
 }
 
-article > .tag > img{
-    width: 30px;
-    height: 15px;
+article > .about > img {
+    display: inline-block;
+    height: auto;
+    max-width: 100%;
+    margin: 8px;
 }
 
-article > .title > hr{
-    margin-top: 0.7%;
-    margin-bottom: 7%;
+.toc-main {
+    display: flex;
+    justify-content: center;
+    align-items: baseline;
+    flex-wrap: wrap-reverse;
 }
 
-article > .content img{
-  width: 96%;
-  margin: 0 auto;
-  display: block;
-  overflow:hidden;
+.toc-main .toc-content-item {
+    display: flex;
+    max-width: 860px;
+    cursor: pointer;
 }
 
-article > .content pre{
-  overflow: auto;
+.toc-main .toc-content-item > .toc-content-item-title {
+    font-size: 1.4rem;
 }
 
-footer{
+.toc-main .toc-content-item > .toc-content-item-date {
+    font-size: 1.2rem;
+    margin: 0 0 0 16px;
+}
+
+.toc-main > .toc-tag {
+    display: flex;
+    justify-content: flex-start;
+    flex-wrap: wrap;
+    max-width: 320px;
+    margin-left: 4%;
+}
+
+.toc-main .toc-tag-item {
+    margin: 4px;
+    padding: 4px;
+    border: 1px solid #74CD00;
+    font-size: 1.4rem;
+    cursor: pointer;
+}
+
+article > .article-main {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+article > .article-main > .article-header {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+}
+
+article > .article-main > .article-header::after {
+    content: "";
+    padding-bottom: 1%;
+    margin-bottom: 1%;
+    border-bottom: 1px solid #000000;
+}
+
+article .article-header-title  {
+    font-size: 1.4rem;
+}
+
+article .article-header-date  {
+    display: flex;
+    justify-content: flex-end;
+}
+
+article .article-header-tag {
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+}
+
+article .article-header-tag > img{
+    height: 20px;
+    margin-right: 4px;
+}
+
+article .article-header-tag > .article-header-tag-item{
+    margin: 0 2px 0 2px;
+}
+
+footer {
     background-color: #FFFFFF;
-    width: 70%;
-    margin: 0 auto;
+    margin: 0 10% 0 10%;
+    border-top: 1px solid #000000;
 }
 
-footer > div{
-    width: 70%;
+footer > div {
     margin: 0 auto;
-    padding-top: 2%;
-    padding-bottom: 4%;
+    padding: 4% 0 4% 0;
     text-align: center;
-}
-
-footer > div > p{
-    font-size: 17px;
+    font-size: 1.2rem;
 }

@@ -2,200 +2,167 @@
 <html>
 
 <head>
-  <meta charset="utf-8">
-  <script type="text/javascript" src="/js/jquery-3.1.0.min.js" ></script> 
-  <link rel="stylesheet" type="text/css" href="/css/style.css" />
-  <link rel="shortcut icon" type="image/x-icon" href="/archives/images/永昌空間-logo.ico" />
-  <title>永昌空間 | DFA實現敏感詞過濾</title>
-  <style>
-    pre > code{
-      color: #006400
-    }
-  </style>
+    <meta charset="utf-8">
+    <link rel="stylesheet" type="text/css" href="/css/style.css" />
+    <link rel="shortcut icon" type="image/x-icon" href="/archives/images/永昌空間-logo.ico" />
+    <title>永昌空間 | DFA實現敏感詞過濾</title>
+    <style>
+        pre > code{
+            color: #006400
+        }
+    </style>
 </head>
 
 <body>
-  <header>
-    <nav>
-      <a href="/index.html">主頁</a>
-      <a href="/archives/導航/目錄.html">目錄</a>
-      <a href="/archives/導航/關於.html">關於</a>
-    </nav>
-  </header>
-  <aside>
-    <hr />
-  </aside>
-  <article>
-  
-    <div class="title">
-      <h2>  
-      DFA實現敏感詞過濾
-      </h2>
-    </div>
 
-    <div class="tag">
-      <li>
-        <span>2016-12-18</span>
-      </li>
-      <img src="/archives/images/tag.png" title="tag.png" />
-      <span>算法</span>
-    </div>
+    <article>
 
-    <hr />
+        <div class="content">
 
-    <div class="content">
+            <p>
+            最近在用Python做敏感詞過濾的事情。開始的想法自然是相當簡單的，就是使用敏感詞列表逐詞匹配輸入文本。
+            但是其效果實在不敢恭維，網路上可以查到很多算法，似乎DFA(Deterministic finite automaton)比較常用。
+            </p>
+            
+            <p>
+            關於DFA的具體細節可以查看
+            <a href="https://en.wikipedia.org/wiki/Deterministic_finite_automaton" target="_blank">[維基百科]</a>
+            。還有一些資料是關於DFA的一種實現，
+            <a href="https://linux.thai.net/~thep/datrie/datrie.html" target="_blank">[雙數組Trie]</a>
+            可供參考。算法太過與深奧，這裏我就不獻醜了。
+            </p>
+            
+            <p>
+            我主要研究的是此人的代碼，
+            <a href="https://github.com/observerss/textfilter.git" target="_blank">[Github代碼]</a>
+            ，至少可以理解依的實現。
+            </p> 
 
-      <p>
-      最近在用Python做敏感詞過濾的事情。開始的想法自然是相當簡單的，就是使用敏感詞列表逐詞匹配輸入文本。
-      但是其效果實在不敢恭維，網路上可以查到很多算法，似乎DFA(Deterministic finite automaton)比較常用。
-      </p>
-      
-      <p>
-      關於DFA的具體細節可以查看
-      <a href="https://en.wikipedia.org/wiki/Deterministic_finite_automaton" target="_blank">[維基百科]</a>
-      。還有一些資料是關於DFA的一種實現，
-      <a href="https://linux.thai.net/~thep/datrie/datrie.html" target="_blank">[雙數組Trie]</a>
-      可供參考。算法太過與深奧，這裏我就不獻醜了。
-      </p>
-      
-      <p>
-      我主要研究的是此人的代碼，
-      <a href="https://github.com/observerss/textfilter.git" target="_blank">[Github代碼]</a>
-      ，至少可以理解依的實現。
-      </p> 
+            <p>
+            首先自然是需要一份敏感詞列表。作爲例子，我這裏的敏感詞列表是[110, 119, 120]。
+            然後構建敏感詞查詢樹。我的樹看起來是這個樣子的。
+            </p>
 
-      <p>
-      首先自然是需要一份敏感詞列表。作爲例子，我這裏的敏感詞列表是[110, 119, 120]。
-      然後構建敏感詞查詢樹。我的樹看起來是這個樣子的。
-      </p>
-
-      <pre>
+            <pre>
 <code>
 {
-    "1": {
         "1": {
-            "0": {
-                "\u0000": 0
-            },
-            "9": {
-                "\u0000": 0
-            }
-        },
-        "2": {
-            "0": {
-                "\u0000": 0
-            }
+                "1": {
+                        "0": {
+                                "\u0000": 0
+                        },
+                        "9": {
+                                "\u0000": 0
+                        }
+                },
+                "2": {
+                        "0": {
+                                "\u0000": 0
+                        }
+                }
         }
-    }
 }
 </code>
-      </pre> 
+            </pre> 
 
-      <p>
-      由於Python有內建的字典類型，構建這樣的查詢樹是很容易的。這是Python代碼。
-      </p> 
+            <p>
+            由於Python有內建的字典類型，構建這樣的查詢樹是很容易的。這是Python代碼。
+            </p> 
 
-      <pre>
+            <pre>
 <code> 
 def add(self, keyword):
 
-  if not isinstance(keyword, unicode):
-    keyword = keyword.decode('utf-8')
+    if not isinstance(keyword, unicode):
+        keyword = keyword.decode('utf-8')
 
-  keyword = keyword.lower()
-  chars = keyword.strip()
-  if not chars:
-    return
+    keyword = keyword.lower()
+    chars = keyword.strip()
+    if not chars:
+        return
 
-  level = self.keyword_chains
-  
-  for i in range(len(chars)):
-  
-    if chars[i] in level:
-      level = level[chars[i]]
-    else:
-      if not isinstance(level, dict):
-        break
-      for j in range(i, len(chars)):
-        level[chars[j]] = {}
-        last_level, last_char = level, chars[j]
-        level = level[chars[j]]
-      last_level[last_char] = {self.delimit: 0}
-      break
+    level = self.keyword_chains
+    
+    for i in range(len(chars)):
+    
+        if chars[i] in level:
+            level = level[chars[i]]
+        else:
+            if not isinstance(level, dict):
+                break
+            for j in range(i, len(chars)):
+                level[chars[j]] = {}
+                last_level, last_char = level, chars[j]
+                level = level[chars[j]]
+            last_level[last_char] = {self.delimit: 0}
+            break
 
-  if i == len(chars) - 1:
-    level[self.delimit] = 0     
+    if i == len(chars) - 1:
+        level[self.delimit] = 0         
 </code>
-      </pre> 
-      
-      <p>
-      敏感詞查詢樹構建好之後，就可以用來過濾輸入文本裏的敏感詞了。
-      假設我這裏輸入的文本是，"abc11011de11911fg20"。那麼過濾後的文本就是，"abc***11de***11fg20"。
-      過濾代碼如下。
-      </p> 
+            </pre> 
+            
+            <p>
+            敏感詞查詢樹構建好之後，就可以用來過濾輸入文本裏的敏感詞了。
+            假設我這裏輸入的文本是，"abc11011de11911fg20"。那麼過濾後的文本就是，"abc***11de***11fg20"。
+            過濾代碼如下。
+            </p> 
 
-      <pre>
+            <pre>
 <code> 
 def filter(self, message, repl="*"):
 
-  if not isinstance(message, unicode):
-    message = message.decode('utf-8')
+    if not isinstance(message, unicode):
+        message = message.decode('utf-8')
 
-  message = message.lower()
-  ret = []
-  
-  start = 0  # start做爲遊標在message上滑動
-  
-  while start < len(message):
-  
-    level = self.keyword_chains  # 從查詢樹的根部(root)開始
-    step_ins = 0  # 匹配到的敏感詞數目
+    message = message.lower()
+    ret = []
     
-    for char in message[start:]:  # 用於匹配一個敏感詞
+    start = 0    # start做爲遊標在message上滑動
     
-      if char in level:  # 匹配到一個字
-        step_ins += 1  # 匹配數加一
-        if self.delimit not in level[char]:
-          level = level[char]  # 沒有匹配到結束符，則繼續向下匹配
-        else:  # 成功匹配到一個敏感詞
-          ret.append(repl * step_ins)  # 敏感詞替換
-          start += step_ins - 1  # 遊標滑動到下一次開始查詢處
-          break  # 一旦匹配成功，立刻跳出for循環
-      else:
-        ret.append(message[start])  # 沒有匹配到的字原樣返回
-        break  # 匹配不成功，立即跳出for循環
+    while start < len(message):
+    
+        level = self.keyword_chains    # 從查詢樹的根部(root)開始
+        step_ins = 0    # 匹配到的敏感詞數目
         
-    else:
-      ret.append(message[start])  # ？？
-      
-    start += 1  # 遊標滑動
+        for char in message[start:]:    # 用於匹配一個敏感詞
+        
+            if char in level:    # 匹配到一個字
+                step_ins += 1    # 匹配數加一
+                if self.delimit not in level[char]:
+                    level = level[char]    # 沒有匹配到結束符，則繼續向下匹配
+                else:    # 成功匹配到一個敏感詞
+                    ret.append(repl * step_ins)    # 敏感詞替換
+                    start += step_ins - 1    # 遊標滑動到下一次開始查詢處
+                    break    # 一旦匹配成功，立刻跳出for循環
+            else:
+                ret.append(message[start])    # 沒有匹配到的字原樣返回
+                break    # 匹配不成功，立即跳出for循環
+                
+        else:
+            ret.append(message[start])    # ？？
+            
+        start += 1    # 遊標滑動
 
-  return ''.join(ret) 
+    return ''.join(ret) 
 </code>
-      </pre>
+            </pre>
 
-      <p>
-      其敏感詞匹配過濾過程如下： <br />
-      （1）大遊標在輸入文本上滑動，並與敏感詞查詢樹匹配。 <br />
-      （2）若匹配成功則轉到（3），否則大遊標向下滑動一個字符。 <br />
-      （3）小遊標在匹配處字符開始滑動，同時匹配敏感詞查詢子樹，轉到（4）。 <br />
-      （4）若小遊標滑動到敏感詞查詢子樹的葉子（結束符），則敏感詞匹配成功，
-           此時可對匹配到的敏感詞進行處理，然後大遊標向下滑動一個敏感詞的長度。 <br />
-      （5）若小遊標並沒有滑動到敏感詞查詢子樹的葉子（結束符），則敏感詞匹配失敗，大遊標向下滑動一個字符，轉到（1）。 <br />
-      （6）直到大遊標滑動到輸入文本結尾，敏感詞匹配過濾過程結束。 <br />
-      </p>       
-      
-    </div>
+            <p>
+            其敏感詞匹配過濾過程如下： <br />
+            （1）大遊標在輸入文本上滑動，並與敏感詞查詢樹匹配。 <br />
+            （2）若匹配成功則轉到（3），否則大遊標向下滑動一個字符。 <br />
+            （3）小遊標在匹配處字符開始滑動，同時匹配敏感詞查詢子樹，轉到（4）。 <br />
+            （4）若小遊標滑動到敏感詞查詢子樹的葉子（結束符），則敏感詞匹配成功，
+                     此時可對匹配到的敏感詞進行處理，然後大遊標向下滑動一個敏感詞的長度。 <br />
+            （5）若小遊標並沒有滑動到敏感詞查詢子樹的葉子（結束符），則敏感詞匹配失敗，大遊標向下滑動一個字符，轉到（1）。 <br />
+            （6）直到大遊標滑動到輸入文本結尾，敏感詞匹配過濾過程結束。 <br />
+            </p>             
+            
+        </div>
 
-  </article>
-  <aside>
-    <hr />
-  </aside>
-  <footer>
-    <div>
-      <p>Copyright @ yongchang.space</p>
-    </div>
-  </footer>
+    </article>
+
 </body>
 
 </html>

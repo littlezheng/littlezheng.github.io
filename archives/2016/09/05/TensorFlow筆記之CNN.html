@@ -2,104 +2,77 @@
 <html>
 
 <head>
-  <meta charset="utf-8">
-  <script type="text/javascript" src="/js/jquery-3.1.0.min.js" ></script> 
-  <link rel="stylesheet" type="text/css" href="/css/style.css" />
-  <link rel="shortcut icon" type="image/x-icon" href="/archives/images/永昌空間-logo.ico" />
-  <title>永昌空間 | TensorFlow筆記之CNN</title>
-  <style>
-    pre > code{
-      color: #006400
-    }
-  </style>
+    <meta charset="utf-8">
+    <link rel="stylesheet" type="text/css" href="/css/style.css" />
+    <link rel="shortcut icon" type="image/x-icon" href="/archives/images/永昌空間-logo.ico" />
+    <title>永昌空間 | TensorFlow筆記之CNN</title>
+    <style>
+        pre > code{
+            color: #006400
+        }
+    </style>
 </head>
 
 <body>
-  <header>
-    <nav>
-      <a href="/index.html">主頁</a>
-      <a href="/archives/導航/目錄.html">目錄</a>
-      <a href="/archives/導航/關於.html">關於</a>
-    </nav>
-  </header>
-  <aside>
-    <hr />
-  </aside>
-  <article>
 
-    <div class="title">
-      <h2>  
-        TensorFlow筆記之CNN
-      </h2>
-    </div>
+    <article>
+        
+        <div class="content">
+            <p>
+                TensorFlow是Google公司開源的深度學習框架，我們使用Python可以很方便地使用該框架。
+                TensorFlow系列筆記主要基於
+                <a href="https://www.tensorflow.org/versions/r0.10/tutorials/index.html" target="_blank">
+                    TensorFlow的官方教程
+                </a>
+                。
+                首先，這個筆記主要是記錄CNN（Convolutional Neural Network）的計算過程，數據使用的是MNIST。
+            </p>
 
-    <div class="tag">
-      <li>
-        <span>2016-09-05</span>
-      </li>
-      <img src="/archives/images/tag.png" title="tag.png" />
-      <span>TensorFlow</span>
-    </div>
+            <p>
+                首先是數據導入過程，可以使用
+                <a href="https://github.com/tensorflow/tensorflow/blob/master/tensorflow/examples/tutorials/mnist/input_data.py" target="_blank">
+                    這個文件
+                </a>
+                來幫助導入MNIST數據。
+            </p>
 
-    <hr />
-
-    <div class="content">
-
-      <p>
-        TensorFlow是Google公司開源的深度學習框架，我們使用Python可以很方便地使用該框架。
-        TensorFlow系列筆記主要基於
-        <a href="https://www.tensorflow.org/versions/r0.10/tutorials/index.html" target="_blank">
-          TensorFlow的官方教程
-        </a>
-        。
-        首先，這個筆記主要是記錄CNN（Convolutional Neural Network）的計算過程，數據使用的是MNIST。
-      </p>
-
-      <p>
-        首先是數據導入過程，可以使用
-        <a href="https://github.com/tensorflow/tensorflow/blob/master/tensorflow/examples/tutorials/mnist/input_data.py" target="_blank">
-          這個文件
-        </a>
-        來幫助導入MNIST數據。
-      </p>
-
-      <pre>
+            <pre>
 <code>
 import tensorflow as tf
 import input_data
 mnist = input_data.read_data_sets("MNIST_data/", one_hot = True)
 </code>
-      </pre>
+            </pre>
 
-      <p>
-        定義幾個有用的函數方便計算。
-      </p>
+            <p>
+                定義幾個有用的函數方便計算。
+            </p>
 
-      <pre>
+            <pre>
 <code>
 def weight_variable(shape):
-  initial = tf.truncated_normal(shape, stddev = 0.1)
-  return tf.Variable(initial)
+    initial = tf.truncated_normal(shape, stddev = 0.1)
+    return tf.Variable(initial)
 
 def bias_variable(shape):
-  initial = tf.constant(0.1, shape = shape)
-  return tf.Variable(initial)
+    initial = tf.constant(0.1, shape = shape)
+    return tf.Variable(initial)
 
 def conv2d(x, W):
-  return tf.nn.conv2d(x, W, strides = [1, 1, 1, 1], padding="SAME")
+    return tf.nn.conv2d(x, W, strides = [1, 1, 1, 1], padding="SAME")
 
 def max_pool_2x2(x):
-  return tf.nn.max_pool(x, ksize = [1, 2, 2, 1], strides = [1, 2, 2, 1], padding="SAME")
+    return tf.nn.max_pool(x, ksize = [1, 2, 2, 1], strides = [1, 2, 2, 1], padding="SAME")
 </code>
-      </pre>
+            </pre>
 
-      <p>
-        這個筆記的網絡由兩層卷積層及最後的全連接層組成，每層卷積層連接一個池化層，最後使用Softmax得到最終結果。
-      </p>
+            <p>
+                這個筆記的網絡由兩層卷積層及最後的全連接層組成，每層卷積層連接一個池化層，最後使用Softmax得到最終結果。
+            </p>
 
-      <pre>
+            <pre>
 <code>
-x = tf.placeholder(tf.float32, [None, 784])  # None for changeable dimention
+x = tf.placeholder(tf.float32, [None, 784])    # None for changeable dimention
 x_image = tf.reshape(x, [-1, 28, 28, 1])
 
 y_ = tf.placeholder(tf.float32, [None, 10])
@@ -135,86 +108,79 @@ train_step = tf.train.AdamOptimizer(1e-4).minimize(cross_entropy)
 correct_prediction = tf.equal(tf.argmax(y_conv, 1), tf.argmax(y_, 1))
 accuracy = tf.reduce_mean(tf.cast(correct_prediction, tf.float32))
 </code>
-      </pre>
+            </pre>
 
-      <p>
-        啓動TensorFlow的交互式對話過程。
-      </p>
+            <p>
+                啓動TensorFlow的交互式對話過程。
+            </p>
 
-      <pre>
+            <pre>
 <code>
 sess = tf.InteractiveSession()
 sess.run(tf.initialize_all_variables())
 </code>
-      </pre>
+            </pre>
 
-      <p>
-        網絡訓練10000次，大概花費幾個小時。（我使用的是Ubuntu虛擬機，內存1024M。）
-      </p>
+            <p>
+                網絡訓練10000次，大概花費幾個小時。（我使用的是Ubuntu虛擬機，內存1024M。）
+            </p>
 
-      <pre>
+            <pre>
 <code>
 for i in range(10000):
-  batch = mnist.train.next_batch(50)
-  if i % 100 == 0:
-    train_accuracy = accuracy.eval(feed_dict = {x: batch[0], y_: batch[1], keep_prob: 1.0})
-    print "step %d, training accuracy %g" % (i, train_accuracy)
-  train_step.run(feed_dict = {x: batch[0], y_: batch[1], keep_prob: 0.5})
+    batch = mnist.train.next_batch(50)
+    if i % 100 == 0:
+        train_accuracy = accuracy.eval(feed_dict = {x: batch[0], y_: batch[1], keep_prob: 1.0})
+        print "step %d, training accuracy %g" % (i, train_accuracy)
+    train_step.run(feed_dict = {x: batch[0], y_: batch[1], keep_prob: 0.5})
 </code>
-      </pre>
+            </pre>
 
-      <p>
-        測試過程使用分批測試，最後取的是均值。（由於我用的是虛擬機，內存較小，直接測試會報內存錯誤。）
-        這裏，測試誤差約爲99.2%左右。
-      </p>
+            <p>
+                測試過程使用分批測試，最後取的是均值。（由於我用的是虛擬機，內存較小，直接測試會報內存錯誤。）
+                這裏，測試誤差約爲99.2%左右。
+            </p>
 
-      <pre>
+            <pre>
 <code>
-test_accuracy_mean = 0.0  # Ues this method to avoid MEMORY problem
+test_accuracy_mean = 0.0    # Ues this method to avoid MEMORY problem
 for i in range(200):
-  batch = mnist.test.next_batch(50)
-  test_accuracy = accuracy.eval(feed_dict = {x: batch[0], y_: batch[1], keep_prob: 1.0})
-  test_accuracy_mean += test_accuracy
+    batch = mnist.test.next_batch(50)
+    test_accuracy = accuracy.eval(feed_dict = {x: batch[0], y_: batch[1], keep_prob: 1.0})
+    test_accuracy_mean += test_accuracy
 print "the mean of test accuracy %g" % (test_accuracy_mean / 200.0)
 </code>
-      </pre>
+            </pre>
 
-      <p>
-        最後不要忘記關閉TensorFlow的會話過程，或者使用with語法避免之。
-      </p>
+            <p>
+                最後不要忘記關閉TensorFlow的會話過程，或者使用with語法避免之。
+            </p>
 
-      <pre>
+            <pre>
 <code>
 sess.close()
 </code>
-      </pre>
+            </pre>
 
-      <p>
-        以上程序中各個變量的格式如下： <br>
-        x_image，[batch, in_height, in_width, in_channels] <br>
-        W_conv，fliter，[filter_height, filter_width, in_channels, out_channels] <br>
-        K，kernel，每個維度的窗口尺寸。 <br>
-        strides，每個維度的滑動步長。 <br>
-        padding取值，"VALID"，"SAME" <br>
-        數據格式一般有兩種，NHWC，NCHW。其中，N（batch size），H（height），W（width），C（channels）。
-      </p>
+            <p>
+                以上程序中各個變量的格式如下： <br>
+                x_image，[batch, in_height, in_width, in_channels] <br>
+                W_conv，fliter，[filter_height, filter_width, in_channels, out_channels] <br>
+                K，kernel，每個維度的窗口尺寸。 <br>
+                strides，每個維度的滑動步長。 <br>
+                padding取值，"VALID"，"SAME" <br>
+                數據格式一般有兩種，NHWC，NCHW。其中，N（batch size），H（height），W（width），C（channels）。
+            </p>
 
-      <p>
-        附一個CNN圖解。
-      </p>
-      <img src="./CNN圖解.jpg" title="CNN圖解.jpg" alt="CNN圖解" />
-      
-    </div>
+            <p>
+                附一個CNN圖解。
+            </p>
+            <img src="/archives/2016/09/05/CNN圖解.jpg" title="CNN圖解.jpg" alt="CNN圖解" />
+            
+        </div>
 
-  </article>
-  <aside>
-    <hr />
-  </aside>
-  <footer>
-    <div>
-      <p>Copyright @ yongchang.space</p>
-    </div>
-  </footer>
+    </article>
+
 </body>
 
 </html>

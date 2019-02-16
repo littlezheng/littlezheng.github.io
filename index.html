@@ -1,52 +1,169 @@
 <!DOCTYPE html>
-<html>
+<html lang="zh">
 
 <head>
-  <meta charset="utf-8">
-  <meta name="description" content="保山啊保山，吾之故鄉！">
-  <script type="text/javascript" src="/js/jquery-3.1.0.min.js" ></script>
-  <link rel="stylesheet" type="text/css" href="/css/style.css" />
-  <link rel="shortcut icon" type="image/x-icon" href="/archives/images/永昌空間-logo.ico" />
-  <title>永昌空間 | 主頁</title>
-  <style>
-    .home_page{
-       width: 70%;
-       margin: 0 auto;  /*對本標籤適用*/
-       text-align: center;  /*對下屬標籤適用*/
-    }
-    .home_page > img{
-      width: 100%;
-      margin: 0 auto;
-    }
-  </style>
+    <meta charset="utf-8">
+    <meta name="description" content="保山啊保山，吾之故鄉！">
+    <script type="text/javascript" src="/js/vue.global.prod.min.js"></script>
+    <script type="text/javascript" src="/js/vue-router.global.prod.min.js"></script>
+    <script type="text/javascript" src="/js/axios.min.js"></script>
+    <script type="text/javascript" src="/js/marked.min.js"></script>
+    <link rel="shortcut icon" type="image/x-icon" href="/archives/images/永昌空間-logo.ico" />
+    <link rel="stylesheet" type="text/css" href="/css/style.css" />
+    <title> 永昌空間 </title>
 </head>
 
 <body>
-  <header>
-    <nav>
-      <a href="/index.html">主頁</a>
-      <a href="/archives/導航/目錄.html">目錄</a>
-      <a href="/archives/導航/關於.html">關於</a>
-    </nav>
-  </header>
-  <aside>
-    <hr />
-  </aside>
-  <article>
-
-    <div class="home_page">
-      <img src="/archives/images/永昌空間.png" title="永昌空間.png" alt="永昌空間" />
+    <div id="app">
+        <header>
+            <nav>
+                <div @click="navmenu = 'honepage'"> 主頁 </div>
+                <div @click="navmenu = 'toc'"> 目錄 </div>
+                <div @click="navmenu = 'about'"> 關於 </div>
+            </nav>
+        </header>
+        <article>
+            <div class="homepage" v-if="navmenu == '' || navmenu == 'honepage'">
+                <img src="/archives/images/永昌空間.png" title="永昌空間.png" alt="永昌空間" />
+            </div>
+            <div class="toc" v-if="navmenu == 'toc'">
+                <table-of-contents toc-path="/archives/導航/目錄.toc" @article="onArticle">
+                </table-of-contents>
+            </div>
+            <div class="about" v-if="navmenu == 'about'">
+                <div>
+                    永昌空間，記錄生活的點點滴滴！希望我能堅持到底，加油！
+                    <a href="mailto: 1278091375#qq.com" target="_blank">（聯繫我）</a>
+                </div>
+                <img src="/archives/導航/關於永昌空間.jpg" title="關於永昌空間.jpg" />
+            </div>
+            <div class="article-main" v-if="navmenu == 'article'">
+                <div class="article-header">
+                    <div class="article-header-title">
+                        {{ article.title }}
+                    </div>
+                    <div>
+                        <div class="article-header-date">
+                            {{ article.date }}
+                        </div>
+                        <div class="article-header-tag">
+                            <img src="/archives/images/tag.png" title="tag.png" />
+                            <div class="article-header-tag-item" v-for="tag in article.tags"> 
+                                {{ tag }} 
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="article-content" v-html="article.content">
+                </div>
+            </div>
+        </article>
+        <footer>
+            <div>
+                Copyright @ yongchang.space
+            </div>
+        </footer>
     </div>
+    <script type="text/javascript">
+        // 創建根組件
+        const app = Vue.createApp({
+            data() {
+                return {
+                    navmenu: "",
+                    article: {},
+                };
+            },
+            methods: {
+                onArticle(article) {  // 文章顯示
+                    this.navmenu = "article";
+                    this.article = article;
+                },
+            },
+            mounted() {
 
-  </article>
-  <aside>
-    <hr />
-  </aside>
-  <footer>
-    <div>
-      <p>Copyright @ yongchang.space</p>
-    </div>
-  </footer>
+            },
+        });
+        // 創建子組件
+        app.component("table-of-contents", {
+            template: `
+                <div class="toc-main">
+                    <ul class="toc-content">
+                        <li class="toc-content-item" v-for="item in toc" @click="onToc(item)" 
+                            v-show="curTag == '' || item.tags.includes(curTag)">
+                            <div class="toc-content-item-title">
+                                {{ item.title }} 
+                            </div>
+                            <div class="toc-content-item-date">
+                                ({{ item.date }})
+                            </div>
+                        </li>
+                    </ul>
+                    <div class="toc-tag">
+                        <div class="toc-tag-item" @click="curTag=''"> 
+                            全部
+                        </div>
+                        <div class="toc-tag-item" v-for="tag in tags" @click="curTag=tag"> 
+                            {{ tag }} 
+                        </div>
+                    </div>
+                </div>
+            `,
+            props: {  // 傳入目錄路徑
+                tocPath: String,
+            },
+            emits: {  // 傳出文章實體
+                article: null,
+            },
+            data() {
+                return {
+                    toc: [],  // 目錄項，table of contents
+                    tags: [],  // 所有的標籤項
+                    curTag: "",  // 當前的標籤選擇
+                };
+            },
+            methods: {
+                onToc(item) {
+                    axios.get(item.path).then((response) => {  // 獲取文件
+                        let suffix = item.path.substring(item.path.lastIndexOf("."));
+                        let content = response.data;  // 文件内容
+                        if (suffix == ".md") {
+                            content = marked.parse(response.data);  // 解析markdown文本
+                        }
+                        this.$emit("article", {
+                            title: item.title,
+                            date: item.date,
+                            tags: item.tags,
+                            content: content,
+                        });
+                    });
+                },
+            },
+            mounted() {
+                axios.get(this.tocPath).then((response) => {  // 獲取目錄文件
+                    // 獲取所有的目錄項
+                    this.toc = response.data.split("\n").filter((line) => {  // 過濾空行及註釋行
+                        line = line.trim();  // 去除行兩端空格
+                        return (line != "" && !line.includes("//!"));  // 去除空行及註釋行
+                    }).map((line) => {  // 組合成目錄項
+                        let item = line.split(/\s+/);
+                        return {
+                            date:  item[0],  // 文章日期
+                            title: item[1],  // 文章標題
+                            tags:  item[2].split("/"),  // 文章標籤，爲數組格式
+                            path:  item[3],  // 文章路徑
+                        };
+                    });
+                    // 獲取所有的標籤項
+                    this.toc.map((item) => {
+                        this.tags.push(...item.tags);
+                    });
+                    this.tags = Array.from(new Set(this.tags));
+                });
+            },
+        })
+        // 掛載組件到DOM
+        app.mount("#app")
+    </script>
 </body>
 
 </html>

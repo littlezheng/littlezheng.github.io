@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <link rel="stylesheet" type="text/css" href="/css/style.css" />
+    <link rel="shortcut icon" type="image/x-icon" href="/archives/images/永昌空間-logo.ico" />
+    <title>永昌空間 | 深度學習入門之基本原理介紹（二）</title>
+    <style>
+        .image-container {
+            width: 97%;
+        }
+    </style>
+</head>
+
+<body>
+
+    <article>
+
+        <div class="content">
+
+            <ol>
+                <li>
+                    <a href="#1-1">深度學習訓練的過程</a>
+                    <ol>
+                        <li>
+                            <a href="#1-1">數據集/a>
+                        </li>
+                        <li>
+                            <a href="#1-2">訓練目標</a>
+                        </li>
+                        <li>
+                            <a href="#1-3">梯度下降</a>
+                        </li>
+                    </ol>
+                </li>
+                <li>
+                    <a href="#2-1">總結一下</a>
+                </li>
+            </ol>
+
+            <div id="1-1"></div>
+            <p>
+                訓練集：用於訓練網絡，使得網絡可以勝任我們的工作。
+            </p>
+            <p>
+                驗證集：用於選擇合適的網絡結構。
+            </p>
+            <p>
+                測試集：用於測試網絡的性能。
+            </p>
+            <div class="image-container">
+                <img src="/archives/2019/02/16/深度學習入門介紹之數據集示例.jpg" alt="數據集示例">
+            </div>
+
+            <div id="1-2"></div>
+            <p>
+                深度學習的訓練目標是，使得loss越來越小。而loss就是網絡輸出與實際值之間的差異。
+            </p>
+            <div class="image-container" style="width: 20%">
+                <img src="/archives/2019/02/16/深度學習入門介紹之常用loss.jpg" alt="常用loss" >
+            </div>
+            <div class="image-container">
+                <img src="/archives/2019/02/16/深度學習入門介紹之loss示意.jpg" alt="loss示意">
+            </div>
+
+            <div id="1-3"></div>
+            <p>
+                梯度下降是一種非常有用的方法，現在的神經網絡訓練幾乎都用到了這種方法。
+                其思想就是，根據loss對神經網絡的參數的梯度變化，來調整網絡參數，比如權重（weight），偏置（bias）等。
+            </p>
+            <div class="image-container">
+                <img src="/archives/2019/02/16/深度學習入門介紹之梯度下降示意-1.jpg" alt="梯度下降示意-1">
+                <img src="/archives/2019/02/16/深度學習入門介紹之梯度下降示意-2.jpg" alt="梯度下降示意-2">
+                <img src="/archives/2019/02/16/深度學習入門介紹之梯度下降示意-3.jpg" alt="梯度下降示意-3">
+                <img src="/archives/2019/02/16/深度學習入門介紹之梯度下降示意-4.jpg" alt="梯度下降示意-4">
+            </div>
+            <p>
+                過擬合問題：當我們使用訓練集訓練神經網絡的時候，訓練loss會不斷下降。
+                使用驗證集驗證網絡的時候，驗證loss可能先下降再上升。
+                那麼，我們應該訓練到什麼時候（哪一個step）停止呢？
+            </p>
+            <div class="image-container">
+                <img src="/archives/2019/02/16/深度學習入門介紹之過擬合問題-1.jpg" alt="過擬合問題-1">
+                <img src="/archives/2019/02/16/深度學習入門介紹之過擬合問題-2.jpg" alt="過擬合問題-2">
+                <img src="/archives/2019/02/16/深度學習入門介紹之過擬合問題-3.jpg" alt="過擬合問題-3">
+            </div>
+            <p>
+                不用當心梯度下降裏的數學計算，我們現在有很多現成的工具可以使用。
+            </p>
+            <div class="image-container">
+                <img src="/archives/2019/02/16/深度學習入門介紹之編程框架.jpg" alt="編程框架">
+            </div>
+
+            <div id="2-1"></div>
+            <p>
+                深度學習最重要的就是數據集，數據集根據用途可以分爲訓練集，驗證集，測試集。
+            </p>
+            <p>
+                神經網絡的目標是不斷調整參數使得loss逐漸減小，但是應該注意過擬合的問題。
+            </p>
+            <p>
+                深度學習現在已經有很多工具（Tensorflow，Keras，MxNet等），我們可以使用這些工具，很輕鬆地完成深度學習的工作。
+            </p>
+
+        </div>
+
+    </article>
+
+</body>
+
+</html>

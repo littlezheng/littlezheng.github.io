@@ -2,168 +2,135 @@
 <html>
 
 <head>
-  <meta charset="utf-8">
-  <script type="text/javascript" src="/js/jquery-3.1.0.min.js" ></script>
-  <link rel="stylesheet" type="text/css" href="/css/style.css" />
-  <link rel="shortcut icon" type="image/x-icon" href="/archives/images/永昌空間-logo.ico" />
-  <title>永昌空間 | 深度學習入門之基本原理介紹（一）</title>
-  <style>
-    .image-container {
-      width: 768px;
-    }
-  </style>
+    <meta charset="utf-8">
+    <link rel="stylesheet" type="text/css" href="/css/style.css" />
+    <link rel="shortcut icon" type="image/x-icon" href="/archives/images/永昌空間-logo.ico" />
+    <title>永昌空間 | 深度學習入門之基本原理介紹（一）</title>
+    <style>
+        .image-container {
+            width: 97%;
+        }
+    </style>
 </head>
 
 <body>
-  <header>
-    <nav>
-      <a href="/index.html">主頁</a>
-      <a href="/archives/導航/目錄.html">目錄</a>
-      <a href="/archives/導航/關於.html">關於</a>
-    </nav>
-  </header>
-  <aside>
-    <hr />
-  </aside>
-  <article>
 
-    <div class="title">
-      <h2>
-      深度學習入門之基本原理介紹（一）
-      </h2>
-    </div>
+    <article>
 
-    <div class="tag">
-      <li>
-        <span>2018-07-01</span>
-      </li>
-      <img src="/archives/images/tag.png" title="tag.png" />
-      <span>deep learning</span>
-    </div>
+        <div class="content">
 
-    <hr />
+            <ol>
+                <li>
+                    <a href="#1-1">深度學習模擬人腦的過程</a>
+                    <ol>
+                        <li>
+                            <a href="#1-1">人腦的神經網絡結構</a>
+                        </li>
+                        <li>
+                            <a href="#1-2">深度學習的網絡結構</a>
+                        </li>
+                    </ol>
+                </li>
+                <li>
+                    <a href="#2-1">深度學習的輸入與輸出</a>
+                </li>
+            </ol>
 
-    <div class="content">
+            <div id="1-1"></div>
+            <p>
+                人類大腦約有1000億神經元。每個神經元有多個樹突，一個軸突。上一個神經元的軸突與下一個神經元的樹突，通過神經遞質傳遞信息。
+            </p>
+            <div class="image-container">
+                <img src="/archives/2018/07/01/深度學習入門介紹之人腦神經網絡結構-1.jpg" alt="人腦神經網絡結構-1">
+                <img src="/archives/2018/07/01/深度學習入門介紹之人腦神經網絡結構-2.jpg" alt="人腦神經網絡結構-2">
+            </div>
 
-      <ol>
-        <li>
-          <a href="#1-1">深度學習模擬人腦的過程</a>
-          <ol>
-            <li>
-              <a href="#1-1">人腦的神經網絡結構</a>
-            </li>
-            <li>
-              <a href="#1-2">深度學習的網絡結構</a>
-            </li>
-          </ol>
-        </li>
-        <li>
-          <a href="#2-1">深度學習的輸入與輸出</a>
-        </li>
-      </ol>
+            <div id="1-2"></div>
+            <p>
+                模擬神經元的樹突與軸突：
+                <math>
+                    z = a<sub>1</sub>w<sub>1</sub> + ... + a<sub>k</sub>w<sub>k</sub> + ... + a<sub>K</sub>w<sub>K</sub> + b
+                </math>
+            </p>
+            <p>
+                模擬神經遞質的作用：
+                <math>
+                    a = &sigma;(z)
+                </math>
+            </p>
+            <p>
+                這種對神經遞質的模擬叫激活函數（非線性）。激活函數有很多，比如：
+                <a href="https://en.wikipedia.org/wiki/Sigmoid_function" target="_blank">sigmoid(z)</a>，
+                <a href="https://en.wikipedia.org/wiki/Hyperbolic_function" target="_blank">tanh(z)</a>，
+                <a href="https://en.wikipedia.org/wiki/Rectifier_(neural_networks)" target="_blank">softplus(z)</a>，
+                <a href="https://en.wikipedia.org/wiki/Rectifier_(neural_networks)" target="_blank">relu(z)</a>
+            </p>
+            <div class="image-container">
+                <img src="/archives/2018/07/01/深度學習入門介紹之模擬網絡結構.jpg" alt="深度學習入門介紹之模擬網絡結構">
+                <img src="/archives/2018/07/01/深度學習入門介紹之激活函數-1.jpg" alt="深度學習入門介紹之激活函數-1">
+                <img src="/archives/2018/07/01/深度學習入門介紹之激活函數-2.jpg" alt="深度學習入門介紹之激活函數-2">
+            </div>
+            <p>
+                模擬神經元的樹突與軸突的計算：
+                <math>
+                    z = 2 x 1 + (-1) x (-2) + 1 x (-1) + 1 = 4
+                </math>
+            </p>
+            <p>
+                模擬神經遞質的作用的計算：
+                <math>
+                    a = &sigma;(4) = sigmoid(4) &asymp; 0.98
+                </math>
+            </p>
+            <div class="image-container">
+                <img src="/archives/2018/07/01/深度學習入門介紹之模擬網絡計算.jpg" alt="深度學習入門介紹之模擬網絡計算">
+            </div>
+            <p>
+                模擬將神經元組合爲神經網絡：
+                <math>
+                    <div>
+                        layer<sub>1</sub> = &sigma;(input x W<sub>1</sub> + b<sub>1</sub>)
+                    </div>
+                    <div>
+                        layer<sub>2</sub> = &sigma;(layer<sub>1</sub> x W<sub>2</sub> + b<sub>2</sub>)
+                    </div>
+                    <div>
+                        ...
+                    </div>
+                    <div>
+                        output = &sigma;(layer<sub>L</sub> x W<sub>L</sub> + b<sub>L</sub>)
+                    </div>
+                </math>
+            </p>
+            <div class="image-container">
+                <img src="/archives/2018/07/01/深度學習入門介紹之組合爲神經網絡-1.jpg" alt="深度學習入門介紹之組合爲神經網絡-1">
+            </div>
+            <p>
+                深度學習模擬神經網絡的運算（激活函數使用relu）
+            </p>
+            <div class="image-container">
+                <img src="/archives/2018/07/01/深度學習入門介紹之組合爲神經網絡-2.jpg" alt="深度學習入門介紹之組合爲神經網絡-2">
+            </div>
 
-      <div id="1-1"></div>
-      <p>
-        人類大腦約有1000億神經元。每個神經元有多個樹突，一個軸突。上一個神經元的軸突與下一個神經元的樹突，通過神經遞質傳遞信息。
-      </p>
-      <div class="image-container">
-        <img src="深度學習入門介紹之人腦神經網絡結構-1.jpg" alt="人腦神經網絡結構-1">
-        <img src="深度學習入門介紹之人腦神經網絡結構-2.jpg" alt="人腦神經網絡結構-2">
-      </div>
+            <div id="2-1"></div>
+            <p>
+                深度學習的輸入之圖像，其在計算機內都是以數字矩陣的形式存儲的。
+                輸入是將圖像的像素值（0~255或0~1）按順序輸入神經網絡，輸出則爲圖像的每一個類標（label）的概率。
+                通常我們選擇概率最大的類標，作爲圖像的最終預測值。
+            </p>
+            <div class="image-container">
+                <img src="/archives/2018/07/01/深度學習入門介紹之圖像存儲方式.jpg" alt="深度學習入門介紹之圖像存儲方式">
+                <img src="/archives/2018/07/01/深度學習入門介紹之圖像輸入輸出.jpg" alt="深度學習入門介紹之圖像輸入輸出">
+            </div>
+            <p>
+                深度學習主要使用的就是神經網絡，這裏的“深度”指的就是神經網絡的層數（通常大於等於三層）。
+                神經網絡主要是模擬人腦神經系統，其中輸入輸出是需要數字化的，這樣計算機纔可以處理。
+            </p>
 
-      <div id="1-2"></div>
-      <p>
-        模擬神經元的樹突與軸突：
-        <math>
-          z = a<sub>1</sub>w<sub>1</sub> + ... + a<sub>k</sub>w<sub>k</sub> + ... + a<sub>K</sub>w<sub>K</sub> + b
-        </math>
-      </p>
-      <p>
-        模擬神經遞質的作用：
-        <math>
-          a = &sigma;(z)
-        </math>
-      </p>
-      <p>
-        這種對神經遞質的模擬叫激活函數（非線性）。激活函數有很多，比如：
-        <a href="https://en.wikipedia.org/wiki/Sigmoid_function" target="_blank">sigmoid(z)</a>，
-        <a href="https://en.wikipedia.org/wiki/Hyperbolic_function" target="_blank">tanh(z)</a>，
-        <a href="https://en.wikipedia.org/wiki/Rectifier_(neural_networks)" target="_blank">softplus(z)</a>，
-        <a href="https://en.wikipedia.org/wiki/Rectifier_(neural_networks)" target="_blank">relu(z)</a>
-      </p>
-      <div class="image-container">
-        <img src="深度學習入門介紹之模擬網絡結構.jpg" alt="深度學習入門介紹之模擬網絡結構">
-        <img src="深度學習入門介紹之激活函數-1.jpg" alt="深度學習入門介紹之激活函數-1">
-        <img src="深度學習入門介紹之激活函數-2.jpg" alt="深度學習入門介紹之激活函數-2">
-      </div>
-      <p>
-        模擬神經元的樹突與軸突的計算：
-        <math>
-          z = 2 x 1 + (-1) x (-2) + 1 x (-1) + 1 = 4
-        </math>
-      </p>
-      <p>
-        模擬神經遞質的作用的計算：
-        <math>
-          a = &sigma;(4) = sigmoid(4) &asymp; 0.98
-        </math>
-      </p>
-      <div class="image-container">
-        <img src="深度學習入門介紹之模擬網絡計算.jpg" alt="深度學習入門介紹之模擬網絡計算">
-      </div>
-      <p>
-        模擬將神經元組合爲神經網絡：
-        <math>
-          <div>
-            layer<sub>1</sub> = &sigma;(input x W<sub>1</sub> + b<sub>1</sub>)
-          </div>
-          <div>
-            layer<sub>2</sub> = &sigma;(layer<sub>1</sub> x W<sub>2</sub> + b<sub>2</sub>)
-          </div>
-          <div>
-            ...
-          </div>
-          <div>
-            output = &sigma;(layer<sub>L</sub> x W<sub>L</sub> + b<sub>L</sub>)
-          </div>
-        </math>
-      </p>
-      <div class="image-container">
-        <img src="深度學習入門介紹之組合爲神經網絡-1.jpg" alt="深度學習入門介紹之組合爲神經網絡-1">
-      </div>
-      <p>
-        深度學習模擬神經網絡的運算（激活函數使用relu）
-      </p>
-      <div class="image-container">
-        <img src="深度學習入門介紹之組合爲神經網絡-2.jpg" alt="深度學習入門介紹之組合爲神經網絡-2">
-      </div>
+        </div>
 
-      <div id="2-1"></div>
-      <p>
-        深度學習的輸入之圖像，其在計算機內都是以數字矩陣的形式存儲的。
-        輸入是將圖像的像素值（0~255或0~1）按順序輸入神經網絡，輸出則爲圖像的每一個類標（label）的概率。
-        通常我們選擇概率最大的類標，作爲圖像的最終預測值。
-      </p>
-      <div class="image-container">
-        <img src="深度學習入門介紹之圖像存儲方式.jpg" alt="深度學習入門介紹之圖像存儲方式">
-        <img src="深度學習入門介紹之圖像輸入輸出.jpg" alt="深度學習入門介紹之圖像輸入輸出">
-      </div>
-      <p>
-        深度學習主要使用的就是神經網絡，這裏的“深度”指的就是神經網絡的層數（通常大於等於三層）。
-        神經網絡主要是模擬人腦神經系統，其中輸入輸出是需要數字化的，這樣計算機纔可以處理。
-      </p>
+    </article>
 
-    </div>
-
-  </article>
-  <aside>
-    <hr />
-  </aside>
-  <footer>
-    <div>
-      <p>Copyright @ yongchang.space</p>
-    </div>
-  </footer>
 </body>
 
 </html>
