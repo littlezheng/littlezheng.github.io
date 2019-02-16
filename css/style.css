@@ -1,0 +1,107 @@
+
+body{
+    background-color: #FFFFFF;
+    font-family: PMingLiU;
+}
+
+header{
+    background-color: #FFFFFF;
+    width: 50%;
+    margin: 0 auto;
+}
+
+header > nav{
+    min-width: 100%;
+    width: 70%;
+    margin: 0 auto;
+    padding-top: 4%;
+    padding-bottom: 4%;
+    text-align: center;
+}
+
+header > nav > a{
+    text-decoration: none;
+    margin-left: 20px;
+    margin-right: 20px;
+    font-size: 26px;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+header > nav > a:link{
+    color: #000000;
+    text-decoration:none;
+}
+
+header > nav > a:visited {
+    color: #000000;
+    text-decoration:none;
+}
+
+header > nav > a:hover{
+    color: #2C3E50;
+    text-decoration: underline;
+}
+
+aside > hr{
+    width: 70%;
+    margin: 0 auto;
+    margin-top: 0.7%;
+    margin-bottom: 0.7%;
+}
+
+article{
+    background-color: #FFFFFF;
+    width: 60%;
+    margin: 0 auto;
+    padding-top: 2%;
+    padding-bottom: 2%;
+    overflow: hidden;
+}
+
+article > .tag{
+    text-align: right;
+}
+
+article > .tag span{
+    font-size: 14px;
+}
+
+article > .tag > img{
+    width: 30px;
+    height: 15px;
+}
+
+article > .title > hr{
+    margin-top: 0.7%;
+    margin-bottom: 7%;
+}
+
+article > .content img{
+  width: 96%;
+  margin: 0 auto;
+  display: block;
+  overflow:hidden;
+}
+
+article > .content pre{
+  overflow: auto;
+}
+
+footer{
+    background-color: #FFFFFF;
+    width: 70%;
+    margin: 0 auto;
+}
+
+footer > div{
+    width: 70%;
+    margin: 0 auto;
+    padding-top: 2%;
+    padding-bottom: 4%;
+    text-align: center;
+}
+
+footer > div > p{
+    font-size: 17px;
+}

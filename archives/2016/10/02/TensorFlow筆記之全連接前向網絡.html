@@ -1,0 +1,398 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta charset="utf-8">
+  <script type="text/javascript" src="/js/jquery-3.1.0.min.js" ></script> 
+  <link rel="stylesheet" type="text/css" href="/css/style.css" />
+  <link rel="shortcut icon" type="image/x-icon" href="/archives/images/永昌空間-logo.ico" />
+  <title>永昌空間 | TensorFlow筆記之全連接前向網絡</title>
+  <style>
+    pre > code{
+      color: #006400
+    }
+  </style>
+</head>
+
+<body>
+  <header>
+    <nav>
+      <a href="/index.html">主頁</a>
+      <a href="/archives/導航/目錄.html">目錄</a>
+      <a href="/archives/導航/關於.html">關於</a>
+    </nav>
+  </header>
+  <aside>
+    <hr />
+  </aside>
+  <article>
+
+    <div class="title">
+      <h2>  
+        TensorFlow筆記之全連接前向網絡
+      </h2>
+    </div>
+
+    <div class="tag">
+      <li>
+        <span>2016-10-02</span>
+      </li>
+      <img src="/archives/images/tag.png" title="tag.png" />
+      <span>TensorFlow</span>
+    </div>
+
+    <hr />
+
+    <div class="content">
+
+      <p>
+        本筆記的全連接前向網絡使用的是TensorFlow官方樣例，使用了MNIST數據集。
+        Github的地址在
+        <a href="https://github.com/tensorflow/tensorflow/tree/master/tensorflow/examples/tutorials/mnist" target="_blank">
+          這裏！
+        </a>
+        全連接網絡的構建在full_connected_feed.py，其中使用了mnist.py中的一些方法。
+      </p>
+
+      <p>
+        首先我們先定義一些全局參數，相當於一些全局常量，方便隨時調整。
+        從這裏也可以看到，神經網絡是一種調參的技術。
+        （神經網絡 = 模型 + 參數 + 數據 ？？？）
+      </p>
+
+      <pre>
+<code>
+# Basic model parameters as external flags.
+flags = tf.app.flags
+FLAGS = flags.FLAGS
+flags.DEFINE_float('learning_rate', 0.01, 'Initial learning rate.')
+flags.DEFINE_integer('max_steps', 2000, 'Number of steps to run trainer.')
+flags.DEFINE_integer('hidden1', 128, 'Number of units in hidden layer 1.')
+flags.DEFINE_integer('hidden2', 32, 'Number of units in hidden layer 2.')
+flags.DEFINE_integer('batch_size', 100, 'Batch size.  '
+           'Must divide evenly into the dataset sizes.')
+flags.DEFINE_string('train_dir', 'data', 'Directory to put the training data.')
+flags.DEFINE_boolean('fake_data', False, 'If true, uses fake data '
+           'for unit testing.')
+</code>
+      </pre>
+
+      <p>
+        生成佔位變量來表示輸入張量，這些變量將作爲圖模型的輸入。
+      </p>
+
+      <pre>
+<code>
+def placeholder_inputs(batch_size):
+  # Note that the shapes of the placeholders match the shapes of the full
+  # image and label tensors, except the first dimension is now batch_size
+  # rather than the full size of the train or test data sets.
+  images_placeholder = tf.placeholder(tf.float32, shape=(batch_size,
+                             mnist.IMAGE_PIXELS))
+  labels_placeholder = tf.placeholder(tf.int32, shape=(batch_size))
+  return images_placeholder, labels_placeholder   
+</code>
+      </pre>  
+
+      <p>
+        將實際數據填充進輸入張量（佔位變量），生成一個填充字典。
+      </p>
+
+      <pre>
+<code>
+def fill_feed_dict(data_set, images_pl, labels_pl):
+  # Create the feed_dict for the placeholders filled with the next
+  # `batch size` examples.
+  images_feed, labels_feed = data_set.next_batch(FLAGS.batch_size,
+                         FLAGS.fake_data)
+  feed_dict = {
+    images_pl: images_feed,
+    labels_pl: labels_feed,
+  }
+  return feed_dict 
+</code>
+      </pre>
+
+      <p>
+        函數do_eval主要用於計算正確率，評估網絡性能。
+        注意這裏"/"，"//"的區別。
+        "/"是浮點數除法，"//"是整數除法。
+        在Python 2.x裏，需要使用聲明，from __future__ import division
+      </p>
+
+      <pre>
+<code>
+def do_eval(sess,
+      eval_correct,
+      images_placeholder,
+      labels_placeholder,
+      data_set):
+  # And run one epoch of eval.
+  true_count = 0  # Counts the number of correct predictions.
+  steps_per_epoch = data_set.num_examples // FLAGS.batch_size
+  num_examples = steps_per_epoch * FLAGS.batch_size
+  for step in xrange(steps_per_epoch):
+  feed_dict = fill_feed_dict(data_set,
+                 images_placeholder,
+                 labels_placeholder)
+  true_count += sess.run(eval_correct, feed_dict=feed_dict)
+  precision = true_count / num_examples
+  print('  Num examples: %d  Num correct: %d  Precision @ 1: %0.04f' %
+    (num_examples, true_count, precision))
+</code>
+      </pre>
+
+      <p>
+        函數run_training用於訓練網絡。
+      </p>
+
+      <pre>
+<code>
+def run_training():
+  # Get the sets of images and labels for training, validation, and
+  # test on MNIST.
+  data_sets = input_data.read_data_sets(FLAGS.train_dir, FLAGS.fake_data)
+
+  # Tell TensorFlow that the model will be built into the default Graph.
+  with tf.Graph().as_default():
+  # Generate placeholders for the images and labels.
+  images_placeholder, labels_placeholder = placeholder_inputs(
+    FLAGS.batch_size)
+
+  # Build a Graph that computes predictions from the inference model.
+  logits = mnist.inference(images_placeholder,
+               FLAGS.hidden1,
+               FLAGS.hidden2)
+
+  # Add to the Graph the Ops for loss calculation.
+  loss = mnist.loss(logits, labels_placeholder)
+
+  # Add to the Graph the Ops that calculate and apply gradients.
+  train_op = mnist.training(loss, FLAGS.learning_rate)
+
+  # Add the Op to compare the logits to the labels during evaluation.
+  eval_correct = mnist.evaluation(logits, labels_placeholder)
+
+  # Build the summary Tensor based on the TF collection of Summaries.
+  summary = tf.merge_all_summaries()
+
+  # Add the variable initializer Op.
+  init = tf.initialize_all_variables()
+
+  # Create a saver for writing training checkpoints.
+  saver = tf.train.Saver()
+
+  # Create a session for running Ops on the Graph.
+  sess = tf.Session()
+
+  # Instantiate a SummaryWriter to output summaries and the Graph.
+  summary_writer = tf.train.SummaryWriter(FLAGS.train_dir, sess.graph)
+
+  # And then after everything is built:
+
+  # Run the Op to initialize the variables.
+  sess.run(init)
+
+  # Start the training loop.
+  for step in xrange(FLAGS.max_steps):
+    start_time = time.time()
+
+    # Fill a feed dictionary with the actual set of images and labels
+    # for this particular training step.
+    feed_dict = fill_feed_dict(data_sets.train,
+                 images_placeholder,
+                 labels_placeholder)
+
+    # Run one step of the model.  The return values are the activations
+    # from the `train_op` (which is discarded) and the `loss` Op.  To
+    # inspect the values of your Ops or variables, you may include them
+    # in the list passed to sess.run() and the value tensors will be
+    # returned in the tuple from the call.
+    _, loss_value = sess.run([train_op, loss],
+                 feed_dict=feed_dict)
+
+    duration = time.time() - start_time
+
+    # Write the summaries and print an overview fairly often.
+    if step % 100 == 0:
+    # Print status to stdout.
+    print('Step %d: loss = %.2f (%.3f sec)' % (step, loss_value, duration))
+    # Update the events file.
+    summary_str = sess.run(summary, feed_dict=feed_dict)
+    summary_writer.add_summary(summary_str, step)
+    summary_writer.flush()
+
+    # Save a checkpoint and evaluate the model periodically.
+    if (step + 1) % 1000 == 0 or (step + 1) == FLAGS.max_steps:
+    checkpoint_file = os.path.join(FLAGS.train_dir, 'checkpoint')
+    saver.save(sess, checkpoint_file, global_step=step)
+    # Evaluate against the training set.
+    print('Training Data Eval:')
+    do_eval(sess,
+        eval_correct,
+        images_placeholder,
+        labels_placeholder,
+        data_sets.train)
+    # Evaluate against the validation set.
+    print('Validation Data Eval:')
+    do_eval(sess,
+        eval_correct,
+        images_placeholder,
+        labels_placeholder,
+        data_sets.validation)
+    # Evaluate against the test set.
+    print('Test Data Eval:')
+    do_eval(sess,
+        eval_correct,
+        images_placeholder,
+        labels_placeholder,
+        data_sets.test)
+</code>
+      </pre>
+
+      <p>
+        在TensorFlow可以使用tf.app.run的方法運行程序，
+        只需要定義一個main函數，並在裏面運行所有代碼即可。
+      </p>
+
+      <pre>
+<code>
+def main(_):
+  run_training()
+
+if __name__ == '__main__':
+  tf.app.run()
+</code>
+      </pre>
+
+      <p>
+        關於mnist.py，主要使用的常量和方法有，
+        mnist.IMAGE_PIXELS，mnist.inference，mnist.loss，mnist.training，mnist.evaluation。
+        下面詳細地列出來作爲參考。
+      </p>
+
+      <p>
+        mnist.IMAGE_PIXELS，是指MNIST中一張圖像的像素數目，這裏總是等於784（28x28）。
+      </p>
+
+      <pre>
+<code>
+# The MNIST dataset has 10 classes, representing the digits 0 through 9.
+NUM_CLASSES = 10
+  
+# The MNIST images are always 28x28 pixels.
+IMAGE_SIZE = 28
+IMAGE_PIXELS = IMAGE_SIZE * IMAGE_SIZE
+</code>
+      </pre>
+
+      <p>
+        mnist.inference，構建MNIST模型用於推理。
+        其輸出是一個長度爲mnist.NUM_CLASSES的Softmax向量值。
+      </p>
+
+      <pre>
+<code>
+def inference(images, hidden1_units, hidden2_units):
+  # Hidden 1
+  with tf.name_scope('hidden1'):
+  weights = tf.Variable(
+    tf.truncated_normal([IMAGE_PIXELS, hidden1_units],
+              stddev=1.0 / math.sqrt(float(IMAGE_PIXELS))),
+    name='weights')
+  biases = tf.Variable(tf.zeros([hidden1_units]),
+             name='biases')
+  hidden1 = tf.nn.relu(tf.matmul(images, weights) + biases)
+  # Hidden 2
+  with tf.name_scope('hidden2'):
+  weights = tf.Variable(
+    tf.truncated_normal([hidden1_units, hidden2_units],
+              stddev=1.0 / math.sqrt(float(hidden1_units))),
+    name='weights')
+  biases = tf.Variable(tf.zeros([hidden2_units]),
+             name='biases')
+  hidden2 = tf.nn.relu(tf.matmul(hidden1, weights) + biases)
+  # Linear
+  with tf.name_scope('softmax_linear'):
+  weights = tf.Variable(
+    tf.truncated_normal([hidden2_units, NUM_CLASSES],
+              stddev=1.0 / math.sqrt(float(hidden2_units))),
+    name='weights')
+  biases = tf.Variable(tf.zeros([NUM_CLASSES]),
+             name='biases')
+  logits = tf.matmul(hidden2, weights) + biases
+  return logits
+</code>
+      </pre>
+
+      <p>
+        mnist.loss，使用交叉熵來計算模型輸出與期望輸出（實際類標）的代價。
+      </p>
+
+      <pre>
+<code>
+def loss(logits, labels):
+  labels = tf.to_int64(labels)
+  cross_entropy = tf.nn.sparse_softmax_cross_entropy_with_logits(
+    logits, labels, name='xentropy')
+  loss = tf.reduce_mean(cross_entropy, name='xentropy_mean')
+  return loss
+</code>
+      </pre>
+
+      <p>
+        mnist.training，使用梯度下降算法來訓練網絡，輸出爲一個訓練操作，train_op。
+      </p>
+
+      <pre>
+<code>
+def training(loss, learning_rate):
+  # Add a scalar summary for the snapshot loss.
+  tf.scalar_summary(loss.op.name, loss)
+  # Create the gradient descent optimizer with the given learning rate.
+  optimizer = tf.train.GradientDescentOptimizer(learning_rate)
+  # Create a variable to track the global step.
+  global_step = tf.Variable(0, name='global_step', trainable=False)
+  # Use the optimizer to apply the gradients that minimize the loss
+  # (and also increment the global step counter) as a single training step.
+  train_op = optimizer.minimize(loss, global_step=global_step)
+  return train_op
+</code>
+      </pre>
+
+      <p>
+        mnist.evaluation，計算正確預測的數目。
+        注意這裏的函數in_top_k，
+        其原型爲result = tf.nn.in_top_k(predictions, targets, k)，
+        對於每一行predictions[i, :]，
+        如果predictions[i, targets[i]]是該行第k個最大的元素，
+        則result[i]爲True，否則其爲False。
+      </p>
+
+      <pre>
+<code>
+def evaluation(logits, labels):
+  # For a classifier model, we can use the in_top_k Op.
+  # It returns a bool tensor with shape [batch_size] that is true for
+  # the examples where the label is in the top k (here k=1)
+  # of all logits for that example.
+  correct = tf.nn.in_top_k(logits, labels, 1)
+  # Return the number of true entries.
+  return tf.reduce_sum(tf.cast(correct, tf.int32))
+</code>
+      </pre>
+      
+    <div>
+    
+  </article>
+  <aside>
+    <hr />
+  </aside>
+  <footer>
+    <div>
+      <p>Copyright @ yongchang.space</p>
+    </div>
+  </footer>
+</body>
+
+</html>

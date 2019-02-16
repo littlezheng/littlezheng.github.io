@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta charset="utf-8">
+  <script type="text/javascript" src="/js/jquery-3.1.0.min.js" ></script> 
+  <link rel="stylesheet" type="text/css" href="/css/style.css" />
+  <link rel="shortcut icon" type="image/x-icon" href="/archives/images/永昌空間-logo.ico" />
+  <title>永昌空間 | RNN簡述之LSTM與GRU</title>
+  <style>
+    pre > code{
+      color: #006400
+    }
+  </style>
+</head>
+
+<body>
+  <header>
+    <nav>
+      <a href="/index.html">主頁</a>
+      <a href="/archives/導航/目錄.html">目錄</a>
+      <a href="/archives/導航/關於.html">關於</a>
+    </nav>
+  </header>
+  <aside>
+    <hr />
+  </aside>
+  <article>
+  
+    <div class="title">
+      <h2>  
+      RNN簡述之LSTM與GRU
+      </h2>
+    </div>
+
+    <div class="tag">
+      <li>
+        <span>2017-04-30</span>
+      </li>
+      <img src="/archives/images/tag.png" title="tag.png" />
+      <span>deep learning</span>
+    </div>
+
+    <hr />
+
+    <div class="content">
+
+      <p>
+      名詞解釋：<br>
+      RNN，Recurrent Neural Network，循環神經網絡。<br>
+      LSTM，Long Short Term Memory，長短期記憶。<br>
+      GRU，Gated Recurrent Unit，門基循環單元。<br>
+      </p>
+      
+      <div>
+        <p>
+        LSTM的關鍵是有三個門，分別是，遺忘門（forget gate），輸入門（input gate），
+        輸出門（output gate）。這些門使用的是sigmoid函數，取值介於0-1之間。
+        通過這些門，有用信息可以隨着時間流到輸出端。
+        </p>
+        <p>LSTM圖解如下：</p>
+        <img src="./LSTM圖解.jpg" title="LSTM圖解.jpg" alt="LSTM圖解" />
+        <p>
+        上圖參數的形狀對理解公式很重要，如下所示：<br>
+        xt，[input_num, hidden_num] <br>
+        ct，[hidden_num, hidden_num] <br>
+        ht，[hidden_num, hidden_num] <br>
+        ft，it，ot，[hidden_num, hidden_num] <br>
+        </p>
+      </div>
+      
+      <div>
+        <p>
+        GRU的結構比LSTM簡單一些，所以運算量也少一些，但是其效果與LSTM差不多。
+        GRU擁有兩個門（r門，z門）。
+        </p>
+        <p>GRU圖解如下：</p>
+        <img src="./GRU圖解.jpg" title="GRU圖解.jpg" alt="GRU圖解" />
+        <p>
+        上圖參數的形狀如下：<br>
+        xt，[input_num, hidden_num] <br>
+        ht，[hidden_num, hidden_num] <br>
+        rt，zt，[hidden_num, hidden_num] <br>
+        </p>
+      </div>
+      
+      <div>
+        <p>LSTM與GRU的輸入輸出問題。</p>
+        <p>
+        輸入張量，[time_step, batch_size, input_num] <br>
+        輸出張量，[time_step, batch_size, hidden_num] <br>
+        </p>
+        <p>
+        其實RNN的信息流動過程很簡單，只需按照時間將其展開即可，如下：
+        </p>
+        <pre>
+          <code>
+for i in range(time_step):
+  hiddens[i], state = RNN.predict(inputs[i], state)
+          </code>
+        </pre>
+        
+      </div>
+    
+    </div>
+
+  </article>
+  <aside>
+    <hr />
+  </aside>
+  <footer>
+    <div>
+      <p>Copyright @ yongchang.space</p>
+    </div>
+  </footer>
+</body>
+
+</html>

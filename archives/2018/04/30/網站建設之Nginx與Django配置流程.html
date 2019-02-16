@@ -1,0 +1,267 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta charset="utf-8">
+  <script type="text/javascript" src="/js/jquery-3.1.0.min.js" ></script>
+  <link rel="stylesheet" type="text/css" href="/css/style.css" />
+  <link rel="shortcut icon" type="image/x-icon" href="/archives/images/永昌空間-logo.ico" />
+  <title>永昌空間 | 網站建設之Nginx與Django配置流程</title>
+  <style>
+    pre > code{
+      color: #006400
+    }
+  </style>
+</head>
+
+<body>
+  <header>
+    <nav>
+      <a href="/index.html">主頁</a>
+      <a href="/archives/導航/目錄.html">目錄</a>
+      <a href="/archives/導航/關於.html">關於</a>
+    </nav>
+  </header>
+  <aside>
+    <hr />
+  </aside>
+  <article>
+
+    <div class="title">
+      <h2>
+      網站建設之Nginx與Django配置流程
+      </h2>
+    </div>
+
+    <div class="tag">
+      <li>
+        <span>2018-04-30</span>
+      </li>
+      <img src="/archives/images/tag.png" title="tag.png" />
+      <span>記錄</span>
+    </div>
+
+    <hr />
+
+    <div class="content">
+
+      <div>
+          安裝所需的軟件，包括，Nginx，Django，Gevent，Gunicorn，Supervisor
+          <ul>
+            <li>Nginx，輕量級Web服務器/反向代理服務器及電子郵件（IMAP/POP3）代理服務器</li>
+            <li>Django，開源Web應用框架</li>
+            <li>Gunicorn，Python WSGI HTTP服務器</li>
+            <li>Gevent，併發IO框架</li>
+            <li>Supervisor，進程管理工具</li>
+            <pre>
+              <code>
+$ sudo apt install nginx
+$ sudo pip install django
+$ sudo pip install gunicorn
+$ sudo pip install gevent
+$ sudo pip install supervisor
+              </code>
+            </pre>
+          </ul>
+      </div>
+
+      <div>
+          Nginx配置步驟
+          <ul>
+            <li>修改配置文件</li>
+            <pre>
+              <code>
+$ sudo vim /etc/nginx/conf.d/xxx.conf
+
+server {
+  listen 80;    # 監聽的端口
+  server_name YOUR_DOMAIN YOUR_REMOTE_IP;
+  rewrite ^(.*) https://$server_name$1 permanent;  # 轉為https訪問
+}
+server {
+  listen 443 ssl;
+  server_name YOUR_DOMAIN YOUR_REMOTE_IP;
+  access_log  /path/to/access.log;   # 默認 /var/log/nginx/access.log
+  error_log   /path/to/error.log;    # 默認 /var/log/nginx/error.log
+  charset utf-8;
+  client_max_body_size 8M;
+  client_body_buffer_size 128k;
+  ssl on;
+  ssl_certificate /path/to/[domain]/fullchain.pem;
+  ssl_certificate_key /path/to/[domain]/privkey.pem;
+  ssl_trusted_certificate /path/to/[domain]/chain.pem;
+  gzip on;    # 啓用網頁壓縮
+  # 支持壓縮的類型
+  gzip_types text/plain application/x-javascript text/css text/javascript application/x-httpd-php application/json text/json image/jpeg image/gif image/png application/octet-stream;
+  error_page  404   /404.html;    # 404 錯誤頁面
+  error_page  500 502 503 504   /50x.html;  # 錯誤頁面
+  location / {
+    proxy_pass http://127.0.0.1:8000;  # Django端口
+    proxy_set_header Host $host;
+    proxy_set_header X-Real-IP $remote_addr;
+    proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+  }
+  # 指定靜態文件路徑
+  location /static/ {
+    alias /path/to/static/;
+    index index.html;
+  }
+}
+              </code>
+            </pre>
+            <li>Nginx運行命令</li>
+            <pre>
+              <code>
+$ sudo /etc/init.d/nginx start
+$ sudo /etc/init.d/nginx stop
+$ sudo /etc/init.d/nginx restart
+              </code>
+            </pre>
+          </ul>
+      </div>
+
+      <div>
+        Django配置步驟
+        <ul>
+          <li>創建Django項目和app，並將應用更改到數據庫</li>
+          <pre>
+            <code>
+$ django-admin startproject your_project_name
+$ cd your_project_name
+$ python manage.py your_app_name
+$ python manage.py makemigrations
+$ python manage.py migrate
+            </code>
+          </pre>
+          <li>在配置文件settings.py裏的INSTALLED_APPS，加入：your_app_name</li>
+          <li>運行Django項目</li>
+          <pre>
+            <code>
+$ python manage.py runserver
+            </code>
+          </pre>
+          <li>Django的模板文件和static（css，js，image）文件</li>
+          <pre>
+            <code>
+$ mkdir ./your_app_name/templates
+$ mkdir ./your_app_name/static
+            </code>
+          </pre>
+          <li>修改配置文件settings.py</li>
+          <pre>
+            <code>
+STATIC_URL = '/static/'
+STATIC_ROOT = os.path.join(BASE_DIR, 'static')
+            </code>
+          </pre>
+          <li>收集項目下的靜態文件到STATIC_ROOT</li>
+          <pre>
+            <code>
+$ python manage.py collectstatic
+            </code>
+          </pre>
+          <li>創建後臺及數據庫管理</li>
+          <pre>
+            <code>
+$ python manage.py createsuperuser
+$ python manage.py dbshell
+&gt .tables
+&gt SQL QUERY;
+# 導入數據庫CSV文件
+&gt .show  # 查看分隔符
+&gt .separator ","  # 改變分隔符
+&gt .schema your_table_name  # 查看表結構
+&gt .import your_csv_filepath your_table_name  # 導入CSV文件到數據庫
+            </code>
+          </pre>
+          <li>Django部署注意點</li>
+          <blockquote>
+            <li>修改配置文件settings.py，DEBUG 設爲 False</li>
+            <li>ALLOWED_HOSTS設置爲['localhost', '127.0.0.1', '[:: 1]', YOUR_REMOTE_IP, .YOUR_DOMAIN]，注意域名前面有一個點</li>
+          </blockquote>
+        </ul>
+      </div>
+
+      <div>
+        Gunicorn配置步驟：在Django的配置文件settings.py裏的INSTALLED_APPS，加入：gunicorn
+      </div>
+
+      <div>
+        Gevent與Supervisor配置步驟
+        <ul>
+          <li>生成Supervisor配置文件</li>
+          <pre>
+            <code>
+$ echo_supervisord_conf &gt supervisor.conf
+            </code>
+          </pre>
+          <li>修改配置文件supervisor.conf，底部添加</li>
+          <pre>
+            <code>
+[program:your_django_project_name]
+command=/path/to/gunicorn --worker-class=gevent your_django_project_name.wsgi:application
+directory=/path/to/your_django_project
+stdout_logfile=/path/to/your_django_project/log/gunicorn/gunicorn.log
+stderr_logfile=/path/to/your_django_project/log/gunicorn/gunicorn.err
+startsecs=0
+stopwaitsecs=0
+autostart=true
+autorestart=true
+            </code>
+          </pre>
+          <li>激活Supervisor的Web管理界面</li>
+          <pre>
+            <code>
+[inet_http_server]     ; inet (TCP) server disabled by default
+port=127.0.0.1:9001    ; (ip_address:port specifier, *:port for alliface)
+username=user          ; (default is no username (open server)
+password=123           ; (default is no password (open server))
+
+[supervisorctl]
+serverurl=unix:///tmp/supervisor.sock ; use a unix:// URL  for a unix socket
+serverurl=http://127.0.0.1:9001       ; use an http:// url to specify an inet socket
+;username=chris                       ; should be same as http_username if set
+;password=123                         ; should be same as http_password if set
+;prompt=mysupervisor                  ; cmd line prompt (default "supervisor")
+;history_file=~/.sc_history           ; use readline history if available
+            </code>
+          </pre>
+        </ul>
+      </div>
+
+      <div>
+        網站部署及運行步驟
+        <pre>
+          <code>
+$ python manage.py makemigrations
+$ python manage.py migrate
+$ sudo rm /etc/nginx/sites-available/default
+$ supervisord -c supervisor.conf
+$ sudo /etc/init.d/nginx restart
+          </code>
+        </pre>
+      </div>
+
+      <div>
+        壓力測試：使用 ab（apache2-utils）工具，-c指定併發數，-n指定測試總數
+        <pre>
+          <code>
+$ ab -c 100 -n 100 YOUY_URL
+          </code>
+        </pre>
+      </div>
+
+    </div>
+
+  </article>
+  <aside>
+    <hr />
+  </aside>
+  <footer>
+    <div>
+      <p>Copyright @ yongchang.space</p>
+    </div>
+  </footer>
+</body>
+
+</html>

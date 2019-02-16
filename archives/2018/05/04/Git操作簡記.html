@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta charset="utf-8">
+  <script type="text/javascript" src="/js/jquery-3.1.0.min.js" ></script>
+  <link rel="stylesheet" type="text/css" href="/css/style.css" />
+  <link rel="shortcut icon" type="image/x-icon" href="/archives/images/永昌空間-logo.ico" />
+  <title>永昌空間 | Git操作簡記</title>
+  <style>
+    pre > code{
+      color: #006400
+    }
+  </style>
+</head>
+
+<body>
+  <header>
+    <nav>
+      <a href="/index.html">主頁</a>
+      <a href="/archives/導航/目錄.html">目錄</a>
+      <a href="/archives/導航/關於.html">關於</a>
+    </nav>
+  </header>
+  <aside>
+    <hr />
+  </aside>
+  <article>
+
+    <div class="title">
+      <h2>
+      Git操作簡記
+      </h2>
+    </div>
+
+    <div class="tag">
+      <li>
+        <span>2018-05-04</span>
+      </li>
+      <img src="/archives/images/tag.png" title="tag.png" />
+      <span>記錄</span>
+    </div>
+
+    <hr />
+
+    <div class="content">
+
+    <div>
+      Git命令速查：<a href="https://github.com/AlexZeitler/gitcheatsheet" target="_blank">https://github.com/AlexZeitler/gitcheatsheet</a>
+    </div>
+
+    <div>
+      <ul>
+        分支管理策略
+        <li>master分支非常穩定，僅用於發佈新版本</li>
+        <li>dev分支不穩定，平時工作都是從其他分支合併到dev分支</li>
+        <li>bug分支，處理Bug的分支</li>
+        <li>feature分支，創建新特徵的分支</li>
+      </ul>
+    </div>
+
+    <div>
+      <ul>
+        多人協作策略
+        <li>試圖git push origin your_branch_name推送自己的修改</li>
+        <li>若推送失敗，則因爲遠程分支比你的本地分支更新，需要試圖git pull合併</li>
+        <li>若git pull提示"no tracking information"，則本地分支未與遠程分支創建鏈接關係，試圖git branch --set-upstream your_branch_name origin/branch_name</li>
+        <li>若合併衝突，則解決衝突，並在本地git commit</li>
+        <li>若無衝突，或衝突已解決，則試圖git push origin your_branch_name</li>
+      </ul>
+    </div>
+
+    <div>
+      <ul>
+        Git基本操作
+        <li>創建空的倉庫：git init（git init --bare，用於Git服務器端創建空的倉庫）</li>
+        <li>克隆遠程倉庫：git clone https://xxx.xxx/xxx.git</li>
+        <li>添加文件到緩存區：git add .（git add your_filename）</li>
+        <li>提交緩存到倉庫：git commit -m "your_commment"</li>
+        <li>創建tag：git tag -a your_tag -m "your_commment"（git tag -d your_tag，刪除tag）</li>
+      </ul>
+    </div>
+
+    <div>
+      <ul>
+        Git查看狀態及差異
+        <li>查看當前倉庫狀態：git status（git status -s 簡單方式查看）</li>
+        <li>查看文件的差異：git diff your_filename（git diff HEAD -- your_filename）</li>
+        <li>查看提交日誌：git log（git log --pretty=oneline，簡單方式顯示）</li>
+        <li>當前版本爲HEAD，上一個版本爲HEAD^，上上個版本爲HEAD^^，上100個版本爲HEAD~100</li>
+        <li>回退到以前的版本：git reset --hard HEAD^（git reset --hard your_commit_id）</li>
+        <li>查看所有提交命令：git reflog</li>
+      </ul>
+    </div>
+
+    <div>
+      <ul>
+        Git分支
+        <li>查看所有分支：git branch</li>
+        <li>創建或切換分支：git checkout -b your_branch_name</li>
+        <li>將其他分支合併到當前分支：git merge your_branch_name（git merge your_branch_name --no-ff -m "your_commment"，禁用fast forward快速合併，強制一個新的提交）</li>
+        <li>刪除分支：git branch -d your_branch_name</li>
+        <li>分支衝突的話，必須先解決衝突，再提交</li>
+        <li>查看分支合併圖：git log --graph</li>
+      </ul>
+    </div>
+
+    <div>
+      <ul>
+        Git遠程倉庫
+        <li>查看遠程倉庫，默認爲origin：git remote（git remote -v 詳細信息）</li>
+        <li>添加本地分支與遠程分支的關聯：git remote add origin your_branch_name</li>
+        <li>從遠程分支拉到本地：git pull（若git pull提示"no tracking information"，則本地分支未與遠程分支創建鏈接關係，試圖git branch --set-upstream your_branch_name origin/branch_name）</li>
+        <li>推送本地分支到遠程倉庫：git push origin your_branch_name</li>
+      </ul>
+    </div>
+
+    </div>
+
+  </article>
+  <aside>
+    <hr />
+  </aside>
+  <footer>
+    <div>
+      <p>Copyright @ yongchang.space</p>
+    </div>
+  </footer>
+</body>
+
+</html>
